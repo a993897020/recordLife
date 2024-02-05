@@ -25,12 +25,15 @@ jobs:
   # Build job
   build:
     name: deploy to staging
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Setup Node
         uses: actions/setup-node@v1
         with:
           node-version: '18.19.x'
+       # 官方action，将代码拉取到虚拟机
+      - name: Checkout  ️ 
+        uses: actions/checkout@v3
       - name: Install and Build   # 安装依赖、打包，如果提前已打包好无需这一步
         run: |
           npm install
