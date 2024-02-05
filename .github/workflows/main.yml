@@ -31,20 +31,15 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: '18.19.x'
-      - name: Install Dependencies and build
+      - name: Install and Build   # 安装依赖、打包，如果提前已打包好无需这一步
         run: |
-              npm install
-              npm run build
-      - name: Setup Pages
-        uses: actions/configure-pages@v3
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v1
+          npm install
+          npm run build
+      - name: Deploy   # 部署
+        uses: JamesIves/github-pages-deploy-action@v4.3.3
         with:
-          # Upload dist repository
-          path: './out'
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v1
+          branch: main # 部署后提交到那个分支
+          folder: out # 这里填打包好的目录名称
       # - name: Checkout
       #   uses: actions/checkout@v4
       # - name: Setup Pages
