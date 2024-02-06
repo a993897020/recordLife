@@ -4,10 +4,10 @@ name: Build, Export and Publish Next.js App
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     branches:
-      - master
+      - main
   workflow_dispatch:
 
 jobs:
@@ -27,7 +27,6 @@ jobs:
         run: |
           git config --global user.name "a993897020"
           git config --global user.email "993897020@qq.com"
-          git remote set-url origin https://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@github.com/a993897020/record-life.git
           git add -A
           git commit -m "New Build"
           git push
