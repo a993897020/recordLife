@@ -2,7 +2,7 @@
  * @Author: 关振俊
  * @Date: 2024-02-05 10:22:55
  * @LastEditors: 关振俊
- * @LastEditTime: 2024-02-06 14:35:01
+ * @LastEditTime: 2024-02-06 14:48:37
  * @Description: 
  */
 /** @type {import('next').NextConfig} */
@@ -15,8 +15,7 @@ const withTM = require('next-transpile-modules')([
 ]);
 
 const nextConfig = {
-    // output: 'export',
-
+    output: 'export', //修改打包方式
     lessLoaderOptions: {
         lessOptions: {
             modifyVars: {
