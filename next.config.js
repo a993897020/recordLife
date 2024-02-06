@@ -2,7 +2,7 @@
  * @Author: 关振俊
  * @Date: 2024-02-05 10:22:55
  * @LastEditors: 关振俊
- * @LastEditTime: 2024-02-06 14:48:37
+ * @LastEditTime: 2024-02-06 15:34:36
  * @Description: 
  */
 /** @type {import('next').NextConfig} */
@@ -16,6 +16,8 @@ const withTM = require('next-transpile-modules')([
 
 const nextConfig = {
     output: 'export', //修改打包方式
+    // basePath:'/out', //本地打包
+    basePath:'/record-life',//线上打包
     lessLoaderOptions: {
         lessOptions: {
             modifyVars: {
@@ -37,15 +39,6 @@ const nextConfig = {
 
         return config;
     },
-    // async redirects() {
-    //   return [
-    //     {
-    //       source: '/',
-    //       destination: '/dashboard/workplace',
-    //       permanent: true,
-    //     },
-    //   ];
-    // },
     pageExtensions: ['tsx'],
 }
 
