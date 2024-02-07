@@ -2,7 +2,7 @@
  * @Author: 关振俊
  * @Date: 2024-02-05 10:27:45
  * @LastEditors: 关振俊
- * @LastEditTime: 2024-02-07 17:51:25
+ * @LastEditTime: 2024-02-07 17:58:02
  * @Description:首页
  */
 import {
@@ -170,8 +170,7 @@ const Index: React.FC = () => {
                 <Form
                   form={form}
                   initialValues={{ author: userInfo.author }}
-                  labelAlign="left"
-                  labelCol={{ span: 1 }}
+                  labelAlign="right"
                   autoComplete="off"
                 >
                   <FormItem
@@ -218,7 +217,7 @@ const Index: React.FC = () => {
                       }}
                     />
                   </Form.Item>
-                  <FormItem wrapperCol={{ offset: 1 }}>
+                  <FormItem wrapperCol={{ offset: 5 }}>
                     <Space>
                       <Button
                         loading={submitLoading}
