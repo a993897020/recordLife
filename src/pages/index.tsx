@@ -2,7 +2,7 @@
  * @Author: 关振俊
  * @Date: 2024-02-05 10:27:45
  * @LastEditors: 关振俊
- * @LastEditTime: 2024-02-07 17:44:14
+ * @LastEditTime: 2024-02-07 17:51:25
  * @Description:首页
  */
 import {
@@ -301,30 +301,7 @@ const Index: React.FC = () => {
                         avatar={item?.avatar ?? false}
                         content={item?.content ?? item}
                         datetime={item?.dateTime ?? false}
-                        // actions={[
-                        //   <span className="custom-comment-action" key="reply">
-                        //     <IconMessage /> 回复
-                        //   </span>,
-                        // ]}
-                      >
-                        {/* <Comment
-                  align="right"
-                  actions={[
-                    <Button key="0" type="secondary">
-                      取消
-                    </Button>,
-                    <Button key="1" type="primary">
-                      回复
-                    </Button>,
-                  ]}
-                  avatar=""
-                  content={
-                    <div>
-                      <Input.TextArea placeholder="请输入内容" />
-                    </div>
-                  }
-                ></Comment> */}
-                      </Comment>
+                      ></Comment>
                     </List.Item>
                   );
                 })}
