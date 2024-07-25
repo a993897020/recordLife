@@ -2,9 +2,10 @@
  * @Author: 关振俊
  * @Date: 2024-02-18 16:10:38
  * @LastEditors: 关振俊
- * @LastEditTime: 2024-02-18 17:54:57
+ * @LastEditTime: 2024-06-07 10:09:16
  * @Description:首页容器
  */
+import { convertToBase64, getUploadObj } from "@/utils";
 import {
   Button,
   Table,
@@ -29,6 +30,7 @@ import FormItem from "@arco-design/web-react/es/Form/form-item";
 import { UploadItem } from "@arco-design/web-react/es/Upload";
 import dayjs from "dayjs";
 import { useEffect, useRef, useState } from "react";
+import "./index.less";
 
 interface IUserInfo {
   avatar: string;
@@ -40,7 +42,7 @@ interface ICacheKey {
   infoKey: string;
 }
 const Index: React.FC = () => {
-  const avatar =
+  const initAvatar =
     "//p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/e278888093bef8910e829486fb45dd69.png~tplv-uwbnlip3yd-webp.webp";
   const [iptVal, setIptVal] = useState<string>("");
   const [dataList, setDataList] = useState<any[]>([]);
@@ -50,7 +52,7 @@ const Index: React.FC = () => {
   });
   const [userInfo, setUserInfo] = useState<IUserInfo>({
     author: "张三",
-    avatar,
+    avatar: initAvatar,
     updateLastTime: "",
   });
   const [isEdit, setIsEdit] = useState(false);
@@ -58,10 +60,10 @@ const Index: React.FC = () => {
     dayjs(new Date().getTime()).format("YYYY-MM-DD HH:mm:ss")
   );
   const [fileList, setFileList] = useState<any[]>([
-    { uid: "1", url: userInfo.avatar, name: "avatar.png" },
+    getUploadObj({ url: initAvatar }),
   ]);
   const [submitLoading, setSubmitLoading] = useState(false);
-  const [pageLoading, setPageLoading] = useState(false);
+  const [pageLoading, setPageLoading] = useState(true);
   const [listCntHeight, setListCntHeight] = useState<number>(0);
 
   const [form] = Form.useForm();
@@ -71,18 +73,7 @@ const Index: React.FC = () => {
     author: "昵称",
     updateLastTime: "最后修改时间",
   };
-  const convertToBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        resolve(reader.result as string);
-      };
-      reader.onerror = (e: any) => {
-        reject(e);
-      };
-      reader.readAsDataURL(file);
-    });
-  };
+
   // 格式化文件路径
   const formatFileOrUrl = async (fileItem: UploadItem[]): Promise<string> => {
     if (fileItem[0].url) {
@@ -96,14 +87,24 @@ const Index: React.FC = () => {
 
   // 发送记录
   const sendRecord = () => {
-    if (!iptVal.trim()) return Message.error("请输入要发送的内容");
+    if (!iptVal.trim()) return Message.warning("请输入要发送的内容");
     const recordItem = {
       dateTime: curDateTime,
       content: iptVal,
+      isAnimation: true,
       ...userInfo,
     };
     setDataList((pre) => [...pre, recordItem]);
+
     setIptVal("");
+  };
+  // 滚动到指定记录位置
+  const scrollSpecifyRecordLocation = (idx: number) => {
+    if (!idx) return;
+    const scrollRecord = document.querySelectorAll(".arco-list-item")[idx];
+    scrollRecord.scrollIntoView({
+      behavior: "smooth",
+    });
   };
 
   // 清除缓存/数据
@@ -112,12 +113,11 @@ const Index: React.FC = () => {
       window.localStorage.removeItem(p);
     });
     setDataList([]);
-    setFileList([{ uid: "1", url: avatar, name: "avatar.png" }]);
+    setFileList([getUploadObj({ url: initAvatar })]);
     setIptVal("");
     setUserInfo({
       author: "张三",
-      avatar:
-        "//p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/e278888093bef8910e829486fb45dd69.png~tplv-uwbnlip3yd-webp.webp",
+      avatar: initAvatar,
       updateLastTime: "",
     });
   };
@@ -136,7 +136,7 @@ const Index: React.FC = () => {
       setTimeout(() => {
         setSubmitLoading(false);
         setUserInfo(formData as IUserInfo);
-        setFileList([{ uid: "1", url: formData.avatar, name: "avatar.png" }]);
+        setFileList([getUploadObj({ url: formData.avatar })]);
         Message.success("修改成功！");
         handleUpdateInfo(false);
         window.localStorage.setItem(cacheKey.infoKey, JSON.stringify(formData));
@@ -166,10 +166,9 @@ const Index: React.FC = () => {
 
     const remainingHeight = viewH - headH - infoH - iptH - listHeadH - outH;
     setListCntHeight(remainingHeight);
-    console.log({ viewH, remainingHeight, headH, outH });
   };
-
-  useEffect(() => {
+  // 获取缓存数据并设置初始值
+  const getCacheDataAndSetVal = () => {
     const cacheData = window.localStorage.getItem(cacheKey.cntKey);
     const infoData = window.localStorage.getItem(cacheKey.infoKey);
     if (cacheData) {
@@ -177,31 +176,55 @@ const Index: React.FC = () => {
     }
     if (infoData) {
       const _infoData = JSON.parse(infoData);
-      setFileList([{ uid: "1", url: _infoData.avatar, name: "avatar.png" }]);
+      setFileList([getUploadObj({ url: _infoData.avatar })]);
       setUserInfo(JSON.parse(infoData));
     }
+    setTimeout(() => {
+      calcCntRemainingHeight();
+    }, 500);
+  };
+  const requestTest = () => {
+    fetch("/api/test", { method: "GET" })
+      .then((res) => res.json())
+      .then((res) => {
+        console.log({ res });
+      });
+  };
+
+  useEffect(() => {
+    getCacheDataAndSetVal();
+    requestTest();
+
     const timer = setInterval(() => {
       setCurDateTime(dayjs(new Date().getTime()).format("YYYY-MM-DD HH:mm:ss"));
     }, 1000);
-    setPageLoading(true);
 
-    setTimeout(() => {
-      calcCntRemainingHeight();
-    });
     window.addEventListener("resize", calcCntRemainingHeight);
+
+    setPageLoading(false);
     return () => {
       clearInterval(timer);
       window.removeEventListener("resize", calcCntRemainingHeight);
     };
   }, []);
+
   useEffect(() => {
     if (dataList.length > 0 && cacheKey) {
       window.localStorage.setItem(cacheKey.cntKey, JSON.stringify(dataList));
+      scrollSpecifyRecordLocation(dataList.length - 1);
+
+      //TODO: to do animation:send location jump record target location animation, close animation
+      // setTimeout(() => {
+      //   const _dataList = dataList.slice();
+      //   _dataList[_dataList.length - 1].isAnimation = false;
+      //   setDataList(_dataList);
+      // }, 2000);
     }
   }, [cacheKey, dataList]);
+
   return (
     <>
-      {pageLoading ? (
+      {!pageLoading ? (
         <>
           <Card
             title={<div suppressHydrationWarning={true}>{curDateTime}</div>}
@@ -328,7 +351,7 @@ const Index: React.FC = () => {
                 </Card>
               )}
               <Input.Search
-                searchButton
+                searchButton={"发送"}
                 placeholder="请输入内容"
                 value={iptVal}
                 onChange={setIptVal}
@@ -337,7 +360,6 @@ const Index: React.FC = () => {
               <List
                 bordered={false}
                 header={<span>{dataList.length} 条记录清单</span>}
-                // wrapperStyle={{ maxHeight: 300, overflow: "auto" }}
                 virtualListProps={{ height: listCntHeight }}
               >
                 {dataList.map((item, index) => {
@@ -345,6 +367,7 @@ const Index: React.FC = () => {
                     <List.Item key={item?.id ?? index}>
                       <Comment
                         align="right"
+                        className={item.isAnimation ? "animation_item" : ""}
                         author={item?.author ?? false}
                         avatar={item?.avatar ?? false}
                         content={item?.content ?? item}

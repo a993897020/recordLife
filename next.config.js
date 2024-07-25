@@ -2,18 +2,23 @@
  * @Author: 关振俊
  * @Date: 2024-02-05 10:22:55
  * @LastEditors: 关振俊
- * @LastEditTime: 2024-02-06 16:39:05
+ * @LastEditTime: 2024-02-19 17:51:13
  * @Description: 
  */
 /** @type {import('next').NextConfig} */
 
 const path = require('path');
-const withLess = require('next-with-less');
+// const withLess = require('next-with-less');
+const {
+    withLess,
+    getLocalIdent
+} = require('./next-with-less');
 const withTM = require('next-transpile-modules')([
     '@arco-design/web-react',
     '@arco-themes/react-arco-pro',
 ]);
 const isProduct = process.env.NODE_ENV === 'production'
+
 
 const nextConfig = {
     output: 'export', //修改打包方式
@@ -36,6 +41,18 @@ const nextConfig = {
         );
         config.resolve.alias['@'] = path.resolve(__dirname, './src');
 
+        config.module.rules.forEach((rule) => {
+            const {
+                oneOf
+            } = rule;
+            if (oneOf) {
+                oneOf.forEach((one) => {
+                    if (!`${one.issuer?.and}`.includes('_app')) return;
+                    one.issuer.and = [path.resolve(__dirname)];
+                });
+            }
+        })
+
         return config;
     },
     pageExtensions: ['tsx'],
@@ -45,5 +62,11 @@ if (isProduct) {
     // basePath:'/out', //本地打包
     nextConfig.basePath = '/record-life'
 }
-
-module.exports = withLess(withTM(nextConfig))
+const additionalConfig = {
+    lessConfig: {
+        moduleTest: /\.m\.less$/,
+        globalTest: /(?<!\.m)\.less$/,
+        getLocalIdent,
+    }
+}
+module.exports = withLess(withTM(nextConfig), additionalConfig)
